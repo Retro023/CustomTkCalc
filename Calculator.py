@@ -6,7 +6,7 @@ from tkinter import *
 ctk.set_default_color_theme('Themes/breeze.json')
 ctk.set_appearance_mode('dark')
 mode = 'dark'
-
+theme = 'breeze'
 
 #|-----Change mode-------|
 def change_mode(textbox, choice):
@@ -24,10 +24,7 @@ def change_mode(textbox, choice):
     elif mode == 'system':
         ctk.set_appearance_mode('system')
         textbox.delete(0.0, END)
-        textbox.insert(END, "Now using system mode")
-
-
-
+        textbox.insert(END, "system mode*ON*")
 
 expression = ''
 #|---------Update entry field------|
@@ -46,11 +43,11 @@ def calculate(entry):
     try:
         result = str(eval(expression))
         entry.delete(0,END)
-        entry.instert(END,result)
+        entry.insert(END,result)
         expression = result
-    except:
+    except ZeroDivisionError:
         entry.delete(0,END)
-        entry(END, "Error!")
+        entry(END, "CANT DIVIDE BY ZERO")
         expression = ""
 
 #|-----Clear entry field-----|
@@ -69,13 +66,38 @@ def main():
     root.title("Calculator")
     root.geometry("500x700")
     
-    entry = ctk.CTkEntry(root, width=300, height=50, font=('Arial', 30))
-    entry.pack(pady=20)    
-    textbox =ctk.CTkTextbox(root, width=500, height=500)
-    textbox.pack(pady=20)
+    entry = ctk.CTkEntry(root, width=500, height=20, font=('Arial', 30))
+    entry.grid(row=0, column=0, columnspan=4, pady=20)
+    textbox =ctk.CTkTextbox(root, width=160, height=10)
+    textbox.grid(row=10, column=0, columnspan=4, pady=10)
+
     modeMenu = ctk.CTkOptionMenu(root, values=["light","dark","system"],command=lambda choice: change_mode(textbox, choice))
-    modeMenu.pack(pady=20)
+    modeMenu.grid(row=2, column=10, columnspan=4, pady=10)
+
+    Button_frame = ctk.CTkFrame(root)
+    button_labels =  [
+        ("7", "8", "9", "÷"),
+        ("4", "5", "6", "x"),
+        ("1", "2", "3", "-"),
+        ("C", "0", "=", "+")
+    ]
+    basic_funcs = {
+        '=': lambda e=entry: calculate(e),
+        'c': lambda e=entry: clear_field(e)
+    }
+    
+    for i, row in enumerate(button_labels):
+        for x, button in enumerate(row):
+            bttn = ctk.CTkButton(
+                root, text=button, width=20, height=20, command=lambda value=button, e=entry: add_expression(value,e) if value != '=' and value != 'c' else (calculate(e) if value == '=' else clear_field(e)))
+            bttn.grid(row=i+3, column=x, pady=5, padx=5, sticky='nsew')
+    for i in range(4):
+        root.grid_columnconfigure(i, weight=1)
+    for i in range(3, 7):
+        root.grid_rowconfigure(i, weight=1)
 
     root.mainloop()
 
-main()
+
+if __name__ == "__main__":
+    main()
