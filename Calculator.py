@@ -41,23 +41,50 @@ def add_expression(value, entry):
 def calculate(entry):
     global expression
     try:
+        expression = expression.replace("x", "*",).replace("÷", "/")
         result = str(eval(expression))
         entry.delete(0,END)
         entry.insert(END,result)
         expression = result
     except ZeroDivisionError:
         entry.delete(0,END)
-        entry(END, "CANT DIVIDE BY ZERO")
+        entry.insert(END, "ERROR: cant divide by zero")
         expression = ""
+    except ValueError:
+        entry.delete(0,END)
+        entry.insert(END,"ERROR: invalid number")
+        expression = ""
+    except TypeError:
+        entry.delete(0,END)
+        entry.insert(END,"ERROR: mismatched data types")
+        expression = ""
+    except OverflowError:
+        entry.delete(0,END)
+        entry.insert(0,"ERROR: number to large to compute")
+        expression = ""
+    except NameError:
+        entry.delete(0,END)
+        entry.insert(0, "ERROR: undefined variable ")
+        expression = ""
+    except ArithmeticError:
+        entry.delete(0,END)
+        entry.insert(0, "Error: Incorrect Arithmetic")
+        expression = ""
+    except AttributeError:
+        entry.delete(0,END)
+        entry.insert(0,"ERROR: attribute")
+        expression = ""
+    except SyntaxError:
+        entry.delete(0,END)
+        entry.insert(0,"ERROR: syntax error")
+        expression = ""
+
 
 #|-----Clear entry field-----|
 def clear_field(entry):
     global expression
     expression = ""
     entry.delete(0,END)
-
-
-
 
 #|-------Main------|
 
@@ -89,7 +116,7 @@ def main():
     for i, row in enumerate(button_labels):
         for x, button in enumerate(row):
             bttn = ctk.CTkButton(
-                root, text=button, width=20, height=20, command=lambda value=button, e=entry: add_expression(value,e) if value != '=' and value != 'c' else (calculate(e) if value == '=' else clear_field(e)))
+                root, text=button, width=20, height=20, command=lambda value=button, e=entry: add_expression(value,e) if value != '=' and value != 'C' else (calculate(e) if value == '=' else clear_field(e)))
             bttn.grid(row=i+3, column=x, pady=5, padx=5, sticky='nsew')
     for i in range(4):
         root.grid_columnconfigure(i, weight=1)
