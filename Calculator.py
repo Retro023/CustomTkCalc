@@ -1,30 +1,25 @@
+
 #|-----------Imports-----------|
 import customtkinter as ctk
 from tkinter import *
 
 #|------Default settings----|
 ctk.set_default_color_theme('Themes/breeze.json')
-ctk.set_appearance_mode('dark')
-mode = 'dark'
-theme = 'breeze'
+ctk.set_appearance_mode('light')
+
 
 #|-----Change mode-------|
-def change_mode(textbox, choice):
-    global mode
-    mode = choice.lower()
-    
-    if mode == 'light':
-        ctk.set_appearance_mode('light')
-        textbox.delete(0.0, END)
-        textbox.insert(END, "Light mode *ON*")
-    elif mode == 'dark':
+def toggle_switch(textbox):
+    if mode_var.get() == "on":
         ctk.set_appearance_mode('dark')
-        textbox.delete(0.0, END)
-        textbox.insert(END, "Dark mode *ON*")
-    elif mode == 'system':
-        ctk.set_appearance_mode('system')
-        textbox.delete(0.0, END)
-        textbox.insert(END, "system mode*ON*")
+        textbox.delete(0.0,END)
+        textbox.insert(END, "Dark mode")
+    else:
+        ctk.set_appearance_mode('light')
+        textbox.delete(0.0,END)
+        textbox.insert(END, "Light mode")
+
+
 
 expression = ''
 #|---------Update entry field------|
@@ -33,8 +28,6 @@ def add_expression(value, entry):
     expression += str(value)
     entry.delete(0, END)
     entry.insert(END, expression)
-
-
 
 
 #|------Eval expression-----|
@@ -89,17 +82,18 @@ def clear_field(entry):
 #|-------Main------|
 
 def main():
+    global mode_var
     root = ctk.CTk()
     root.title("Calculator")
     root.geometry("500x700")
     
-    entry = ctk.CTkEntry(root, width=500, height=20, font=('Arial', 30))
+    entry = ctk.CTkEntry(root, width=500, height=95, font=('Arial', 30))
     entry.grid(row=0, column=0, columnspan=4, pady=20)
     textbox =ctk.CTkTextbox(root, width=160, height=10)
-    textbox.grid(row=10, column=0, columnspan=4, pady=10)
-
-    modeMenu = ctk.CTkOptionMenu(root, values=["light","dark","system"],command=lambda choice: change_mode(textbox, choice))
-    modeMenu.grid(row=2, column=10, columnspan=4, pady=10)
+    textbox.grid(row=10, column=2, columnspan=4, pady=10)
+    mode_var = ctk.StringVar(value="off")
+    mode = ctk.CTkSwitch(master=root, text="Dark Mode",variable=mode_var, onvalue="on", offvalue="off"  ,command=lambda:toggle_switch(textbox))
+    mode.grid(row=10, column=1, columnspan=4, pady=10, sticky="wn")
 
     Button_frame = ctk.CTkFrame(root)
     button_labels =  [
@@ -116,8 +110,10 @@ def main():
     for i, row in enumerate(button_labels):
         for x, button in enumerate(row):
             bttn = ctk.CTkButton(
-                root, text=button, width=20, height=20, command=lambda value=button, e=entry: add_expression(value,e) if value != '=' and value != 'C' else (calculate(e) if value == '=' else clear_field(e)))
+                root, text=button, width=20, height=20, command=lambda value=button, 
+                    e=entry: add_expression(value,e) if value != '=' and value != 'C' else (calculate(e) if value == '=' else clear_field(e)))
             bttn.grid(row=i+3, column=x, pady=5, padx=5, sticky='nsew')
+    
     for i in range(4):
         root.grid_columnconfigure(i, weight=1)
     for i in range(3, 7):
